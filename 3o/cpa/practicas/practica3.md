@@ -1,3 +1,83 @@
+# CPA - Práctica 3: Paralelización con MPI
+
+## Introducción
+
+## 1. Primeros pasos con MPI
+
+### 1.1. Hola mundo
+
+* Para ejecutar un problema con MPI hay que importar las librerías con `#include <mpi.h>;`
+* La sección que va a ejecutar el programa en paralelo va a estar entre las sentencias: `MPI_Init(&argc, &argv);` y `MPI_Finalize();`
+* Copiar el resto de Docs
+
+* Con MPI podemos reservar más de 1 nodo. Con OpenMP, sólo podíamos reservar un nodo ya que los hilos tenían memoria compartida.
+* Para determinar cuantos procesos queremos, lo escribimos en --ntasks en el fichero de trabajo.
+* Como los nodos de kahan tienen varios cores, sería seguro escribir más --ntasks que --nodes.
+* `scontrol show hostnames $SLURM_JOB_NODELIST` sirve para saber qué nodos del clúster han sido reservados.
+* Kahan sólo tiene 4 nodos y es recomendado usar como máximo 2.
+
+#### Ejercicio 1: Realiza diverrsas ejecuciones del programa usando el sistema de colas, con diferente número de procesos y nodos
+
+Sería copiar este código en un archivo con nombre `ejercicio1-x.sh`:
+
+```
+#!/bin/sh
+#SBATCH --nodes=1
+#SBATCH --ntasks=2
+#SBATCH --time=5:00
+#SBATCH --partition=cpa
+scontrol show hostnames $SLURM_JOB_NODELIST
+mpiexec ./hello
+```
+
+Cambiando los números de `nodes` y `ntasks` y ejecutándolo desde kahan con:
+
+```
+$ ssh -Y -l login@alumno.upv.es kahan.dsic.upv.es
+$ mkdir prac3
+$ cd prac3
+$ mpicc -Wall -o hello ~/W/cpa/prac3/hello.c
+$ $ sbatch ~/W/cpa/prac3/ejercicio1-x.ssh
+$ cat slurm-x.out
+```
+
+#### Ejercicio 2:
+
+Partiendo del código:
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main (int argc, char *argv[])
+{
+	MPI_Init(&argc,&argv);
+	printf("Hola mundo");
+	MPI_Finalize();
+	return 0;
+}
+```
+
+Declaramos dos enteros `rank` y `sze`.
+
+Con `MPI_Comm_rank(MPI_COMM_WORLD,&rank);` guardaremos el identificador de cada uno de los procesos y con `MPI_Comm_size(MPI_COMM_WORLD, &size);` guardaremos la cantidad de procesos que hay en ejecución entre las sentencias `MPI_Init(&argc,&argv);` y `MPI_Finalize();`.
+
+Por último, haremos que cada proceso imprima su identificador y el número de procesos con `printf("Hola mundo del proceso" %d de %d\n",rank,size);`
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main (int argc, char *argv[])
+{
+	int rank, size;
+	MPI_Init(&argc,&argv);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	printf("Hola mundo del proceso" %d de %d\n",rank,size);
+	MPI_Finalize();
+	return 0;
+}
+```
+
 ### 1.2. Cálculo de Pi
 
 El programa `mpi_pi.c` aproxima el valor de pi con el método de los rectángulos que vimos en la primera práctica. El intervalo [0, 1] se descompone en n subintervalos. Cada proceso realiza el cáclulo asociado a n/p rectángulos y lo guardan en la variable `mypi`:
