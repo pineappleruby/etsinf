@@ -175,29 +175,27 @@ A tener en cuenta: `0($a0)` = `reloj`
 
 ---
 
-## La multiplicación y la división de enteros y su coste temporal
-
-> Leer
-
 ## La operación de multiplicación: conversión de HH:MM:SS a segundos
 
-#### Para leer de memoria por separado cada uno de los campos del reloj (HH, MM y SS) se puede
-usar una instrucción de lectura de byte. Razone si hay que utilizar lb (load byte) o lbu (load byte
-unsigned).
+#### Para leer de memoria por separado cada uno de los campos del reloj (HH, MM y SS) se puede usar una instrucción de lectura de byte. Razone si hay que utilizar lb (load byte) o lbu (load byte unsigned).
 
-> Preguntar al profe
+Hay que usar `lbu` por dos razones:
+
+* Sólo nos interesan los 6 bits de menor peso (el de signo es el 8º bit).
+* No tiene sentido leer horas negativas en este contexto.
+
+---
 
 #### Implemente la subrutina `devuelve_reloj_en_s`.
 
 ```r
-        ########################################################## 
-        # Subrutina que pasa el formato HH:MM:SS a segundos
-        # Entrada: $a0 con la dirección de la variable reloj
-				# Salida: %v0 con los segundos resultantes
-        ########################################################## 
+########################################################## 
+# Subrutina que pasa el formato HH:MM:SS a segundos
+# Entrada: $a0 con la dirección de la variable reloj
+# Salida: %v0 con los segundos resultantes
+########################################################## 
                 
-devuelve_reloj_
-en_s:
+devuelve_reloj_en_s:
 				li $v0, 0
 				
 				lbu $v0, 3($a0)
@@ -217,16 +215,23 @@ en_s:
 				jr $ra
 ```
 
+---
+
 #### ¿Qué tipo de instrucciones de suma han de utilizarse en la subrutina, add o addu?
 
-> Pregunta al profe
+Hay que usar `addu` por el mismo motivo que antes.
 
-#### ¿Cuántas instrucciones de multiplicación se ejecutan en la subrutina devuelve_reloj_en_s?
+---
+
+#### ¿Cuántas instrucciones de multiplicación se ejecutan en la subrutina `devuelve_reloj_en_s`?
+
+2
+
+---
+
+#### ¿Cuántas instrucciones de movimiento de información entre los registros del banco de enteros y los registros hi y lo se ejecutan en la subrutina diseñada?
 
 2
 
-#### ¿Cuántas instrucciones de movimiento de información entre los registros del banco de enteros y
-los registros hi y lo se ejecutan en la subrutina diseñada?
-
-2
+---
 
